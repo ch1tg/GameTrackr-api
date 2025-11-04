@@ -126,12 +126,10 @@ __pycache__/
 # === Secrets ===
 .env
 
-# === DB ===
-*.sqlite
-
 /.idea/.gitignore
 /.idea/GameTrackr.iml
 /.idea/misc.xml
 /.idea/modules.xml
 /.idea/inspectionProfiles/profiles_settings.xml
 /.idea/vcs.xml
+/mysql-data/
