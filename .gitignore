@@ -1,0 +1,15 @@
+# === PyCharm / JetBrains ===
+.idea/
+
+# === Venv ===
+.venv/
+venv/
+
+# === Python ===
+__pycache__/
+
+# === Secrets ===
+.env
+
+# === DB ===
+*.sqlite
