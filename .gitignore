@@ -128,3 +128,9 @@ __pycache__/
 
 # === DB ===
 *.sqlite
+/.idea/.gitignore
+/.idea/GameTrackr.iml
+/.idea/misc.xml
+/.idea/modules.xml
+/.idea/inspectionProfiles/profiles_settings.xml
+/.idea/vcs.xml
