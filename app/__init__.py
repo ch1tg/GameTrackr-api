@@ -12,3 +12,11 @@ def create_app(config_class=Config):
     jwt.init_app(app)
     migrate.init_app(app, db)
 
+    from . import models
+
+    from .routes import auth
+    app.register_blueprint(auth.bp)
+
+    return app
+
+
