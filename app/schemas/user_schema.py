@@ -1,5 +1,5 @@
 from app.extensions import ma
-from marshmallow import fields, validate
+from marshmallow import fields, validate, ValidationError, validates_schema
 
 class UserSchema(ma.Schema):
 
@@ -28,7 +28,22 @@ class UserSchema(ma.Schema):
             )
         ]
     )
-    created_at = fields.DateTime(dump_only=True)
+    registered_on = fields.DateTime(dump_only=True)
 
-user_register_schema = UserSchema()
+class UserLoginSchema(ma.Schema):
+    username = fields.Str()
+    email = fields.Email()
+    password = fields.Str(required=True, load_only=True)
+
+    @validates_schema
+    def check_for_username_or_email(self, data, **kwargs):
+        username = data.get("username")
+        email = data.get("email")
+        if not username and not email:
+            raise ValidationError("Field username or email is required",field_name="_schema")
+
+
+
+user_default_schema = UserSchema()
+user_login_schema = UserLoginSchema()
 user_public_schema = UserSchema(exclude=("email",))

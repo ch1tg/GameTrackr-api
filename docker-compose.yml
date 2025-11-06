@@ -2,7 +2,6 @@
 
 services:
 
-  # --- 1. Наш Flask-сервер (Приложение) ---
   app:
     container_name: gametrackr-app
     build: .
@@ -18,21 +17,19 @@ services:
     depends_on:
       - db
 
-  # --- 2. Наш Сервер Базы Данных (MySQL) ---
   db:
     container_name: gametrackr-db
-    # "Скачай готовый образ MySQL 8.0"
+
     image: mysql:8.0
-    # "Проброс" портов:
-    # 3307 (твой локальный PyCharm) -> 3306 (внутри контейнера)
+
     ports:
       - "3307:3306"
-    # "Сохраняй ВСЕ данные в папку './mysql-data' (снаружи)"
+
     volumes:
       - ./mysql-data:/var/lib/mysql
-    # "Секреты", которые нужны MySQL для *первого* запуска
+
     environment:
-      MYSQL_ROOT_PASSWORD: ${DB_ROOT_PASSWORD} # Взять из .env
-      MYSQL_DATABASE: ${DB_NAME}               # Взять из .Venv
-      MYSQL_USER: ${DB_USER}                   # Взять из .env
-      MYSQL_PASSWORD: ${DB_PASSWORD}           # Взять из .env
+      MYSQL_ROOT_PASSWORD: ${DB_ROOT_PASSWORD}
+      MYSQL_DATABASE: ${DB_NAME}
+      MYSQL_USER: ${DB_USER}
+      MYSQL_PASSWORD: ${DB_PASSWORD}
