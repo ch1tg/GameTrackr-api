@@ -42,8 +42,39 @@ class UserLoginSchema(ma.Schema):
         if not username and not email:
             raise ValidationError("Field username or email is required",field_name="_schema")
 
+class UserUpdateSchema(ma.Schema):
+    username = fields.Str(
+        validate=[
+            validate.Length(min=3, error="Username must be at least 3 characters long."),
+            validate.Length(max=20, error="Username must be at most 20 characters long."),
+            validate.Regexp(
+                r'^[a-zA-Z0-9_-]+$',
+                error="Username must contain only letters, numbers and underscores.",
+            )
+        ]
 
+    )
+    email = fields.Email()
+
+class UserUpdatePassSchema(ma.Schema):
+    old_password = fields.Str(required=True,load_only=True)
+    new_password = fields.Str(
+        required=True,
+        load_only=True,
+        validate=[
+            validate.Length(min=8, error="Password must be at least 8 characters long."),
+            validate.Regexp(
+                r'^[a-zA-Z0-9_-]+$',
+                error="Password must contain only letters, numbers and underscores.",
+            )
+        ]
+    )
+class UserDeleteSchema(ma.Schema):
+    password = fields.Str(required=True, load_only=True)
 
 user_default_schema = UserSchema()
+user_update_schema = UserUpdateSchema()
 user_login_schema = UserLoginSchema()
+user_update_password_schema = UserUpdatePassSchema()
+user_delete_schema = UserDeleteSchema()
 user_public_schema = UserSchema(exclude=("email",))

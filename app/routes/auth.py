@@ -55,3 +55,60 @@ def me():
         return jsonify({"error": "User not found"}), 404
     return jsonify(user_default_schema.dump(user)), 200
 
+@bp.route('/me', methods=['PATCH'])
+@jwt_required()
+def me_patch():
+    user_id = get_jwt_identity()
+    data = request.get_json()
+
+    try:
+        updated_user=user_service.update_user_profile(user_id, data)
+        return jsonify(user_default_schema.dump(updated_user)), 200
+    except ValidationException as e:
+        db.session.rollback()
+        return jsonify({"error":e.message}), e.status_code
+    except IntegrityError as e:
+        db.session.rollback()
+        return jsonify({"error": "IntegrityError"}), 409
+    except Exception as e:
+        db.session.rollback()
+        return jsonify({"error": "Internal Server Error"}), 500
+
+
+@bp.route('/me/password', methods=['PUT'])
+@jwt_required()
+def me_password():
+    user_id = get_jwt_identity()
+    data = request.get_json()
+
+    try:
+        updated_user=user_service.change_user_password(user_id, data)
+        return jsonify(user_default_schema.dump(updated_user)), 200
+    except ValidationException as e:
+        db.session.rollback()
+        return jsonify({"error":e.message}), e.status_code
+    except IntegrityError as e:
+        db.session.rollback()
+        return jsonify({"error": "IntegrityError"}), 409
+    except Exception as e:
+        db.session.rollback()
+        return jsonify({"error": "Internal Server Error"}), 500
+
+@bp.route('/me', methods=['DELETE'])
+@jwt_required()
+def me_delete():
+    user_id = get_jwt_identity()
+    data = request.get_json()
+
+    try:
+        user_service.delete_user_account(user_id, data)
+        return '', 204
+    except ValidationException as e:
+        db.session.rollback()
+        return jsonify({"error": e.message}), e.status_code
+    except IntegrityError as e:
+        db.session.rollback()
+        return jsonify({"error": "IntegrityError"}), 409
+    except Exception as e:
+        db.session.rollback()
+        return jsonify({"error": "Internal Server Error"}), 500
