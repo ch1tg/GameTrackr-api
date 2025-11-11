@@ -49,8 +49,7 @@ def login_user(data):
     if user is None or not user.check_password(password):
         raise ValidationException("Invalid login data", status_code=401)
 
-    access_token = create_access_token(identity=str(user.id))
-    return access_token
+    return user
 
 
 
@@ -66,7 +65,6 @@ def get_user_by_username(username):
     return db.session.query(User).filter_by(username=username).first()
 
 def update_user_profile(user_id, data_to_update):
-    # Ensure user_id is an integer (access token stores it as string)
     try:
         uid = int(user_id)
     except (TypeError, ValueError):

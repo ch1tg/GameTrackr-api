@@ -1,10 +1,15 @@
 from flask import Flask
 from .config import Config
+from flask_cors import CORS
 from .extensions import db, ma, migrate, jwt
 
 def create_app(config_class=Config):
     app = Flask(__name__)
-
+    CORS(
+        app,
+        origins=["http://localhost:5173"],
+        supports_credentials=True
+    )
     app.config.from_object(config_class)
 
     db.init_app(app)
