@@ -11,6 +11,10 @@ class User(db.Model):
     password_hash = db.Column(db.String(256), nullable=False)
     registered_on = db.Column(db.DateTime, nullable=False, default=lambda: datetime.now(timezone.utc))
 
+    wishlist_items = db.relationship('Wishlist',
+                                     back_populates='user',
+                                     cascade='all, delete-orphan')
+
     def set_password(self, password):
         self.password_hash = generate_password_hash(password)
 

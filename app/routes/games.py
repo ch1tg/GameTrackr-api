@@ -69,3 +69,51 @@ def get_trending_games():
 
     except requests.exceptions.RequestException as e:
         return jsonify({"error": f"Failed to fetch from RAWG: {str(e)}"}), 503
+
+
+def transform_rawg_game_details(game):
+
+    genres = [g.get('name') for g in game.get('genres', []) if g.get('name')]
+    platforms = []
+    if game.get('platforms'):
+        platforms = [p.get('platform', {}).get('name') for p in game.get('platforms', []) if p.get('platform')]
+
+    return {
+        'id': game.get('id'),
+        'name': game.get('name'),
+        'description': game.get('description'),
+        'metacritic': game.get('metacritic'),
+        'released': game.get('released'),
+        'background_image': game.get('background_image'),
+        'website': game.get('website'),
+        'genres': genres,
+        'platforms': platforms,
+    }
+
+
+
+@bp.route('/<int:game_id>', methods=['GET'])
+def get_game_details(game_id):
+    api_key = current_app.config.get('RAWG_API_KEY')
+    if not api_key:
+        return jsonify({"error": "RAWG API key is not configured"}), 500
+
+    try:
+
+        url = f'https://api.rawg.io/api/games/{game_id}'
+        params = {'key': api_key}
+
+        response = requests.get(url, params=params, timeout=10)
+        response.raise_for_status()
+        raw_data = response.json()
+
+        game_details = transform_rawg_game_details(raw_data)
+
+        return jsonify(game_details), 200
+
+    except requests.exceptions.HTTPError as e:
+        if e.response.status_code == 404:
+            return jsonify({"error": "Game not found"}), 404
+        return jsonify({"error": f"HTTP error: {str(e)}"}), e.response.status_code
+    except requests.exceptions.RequestException as e:
+        return jsonify({"error": f"Failed to fetch from RAWG: {str(e)}"}), 503

@@ -25,5 +25,7 @@ def create_app(config_class=Config):
     app.register_blueprint(users.bp)
     from .routes import games
     app.register_blueprint(games.bp)
+    from .routes import wishlist
+    app.register_blueprint(wishlist.bp)
 
     return app
