@@ -7,7 +7,7 @@ from app.schemas.user_schema import user_default_schema, user_update_password_sc
 from app.exceptions.exceptions import ValidationException
 from marshmallow import ValidationError
 
-# --- 1. Создание ---
+
 def register_user(data):
     try:
         validated_data = user_default_schema.load(data)

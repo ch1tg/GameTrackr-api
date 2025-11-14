@@ -16,5 +16,32 @@ class Config:
 
     JWT_ACCESS_TOKEN_EXPIRES = timedelta(days=1)
     JWT_TOKEN_LOCATION = ["cookies", "headers"]
-    JWT_COOKIE_SECURE = False  # если ты не на https
+    JWT_COOKIE_SECURE = False
     JWT_COOKIE_SAMESITE = "None"
+
+    RAWG_API_KEY = os.environ.get('RAWG_API_KEY')
+    SWAGGER = {
+        'openapi': '3.0.2',
+        'info': {
+            'title': 'GameTrackr API',
+            'version': '1.0.0',
+            'description': 'The official API documentation for the GameTrackr project.'
+        },
+        'uiversion': 3,
+        'components': {
+            'securitySchemes': {
+                'bearerAuth': {
+                    'type': 'http',
+                    'scheme': 'bearer',
+                    'bearerFormat': 'JWT',
+                    'description': 'JWT Access Token. Format: "Bearer <token>"'
+                },
+                'csrfToken': {
+                    'type': 'apiKey',
+                    'in': 'header',
+                    'name': 'X-CSRF-TOKEN',
+                    'description': 'CSRF Token (from \'csrf_access_token\' cookie)'
+                }
+            }
+        }
+    }
