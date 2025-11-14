@@ -1,5 +1,6 @@
 import requests
 from flask import Blueprint, jsonify, current_app, request
+from flasgger import swag_from
 
 bp = Blueprint('games', __name__, url_prefix='/games')
 
@@ -23,6 +24,36 @@ def transform_rawg_game_preview(game):
 
 
 @bp.route('/trending', methods=['GET'])
+@swag_from({
+    'tags': ['Games'],
+    'summary': 'Get trending games from RAWG with optional filters',
+    'parameters': [
+        {'name': 'page', 'in': 'query', 'schema': {'type': 'integer', 'minimum': 1}, 'required': False},
+        {'name': 'ordering', 'in': 'query', 'schema': {'type': 'string'}, 'required': False, 'description': 'RAWG ordering, e.g. -relevance'},
+        {'name': 'platform', 'in': 'query', 'schema': {'type': 'string'}, 'required': False, 'description': 'RAWG platform id'}
+    ],
+    'responses': {
+        200: {
+            'description': 'Trending games page',
+            'content': {
+                'application/json': {
+                    'examples': {
+                        'example': {
+                            'value': {
+                                'games': [
+                                    { 'id': 123, 'name': 'Foo', 'background_image': '...', 'metacritic': 90, 'parent_platforms': ['pc'] }
+                                ],
+                                'nextPage': 2
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        500: {'description': 'RAWG API key missing or upstream error'},
+        503: {'description': 'Failed to fetch from RAWG'}
+    }
+})
 def get_trending_games():
     api_key = current_app.config.get('RAWG_API_KEY')
     if not api_key:
@@ -93,6 +124,40 @@ def transform_rawg_game_details(game):
 
 
 @bp.route('/<int:game_id>', methods=['GET'])
+@swag_from({
+    'tags': ['Games'],
+    'summary': 'Get detailed RAWG game info by id',
+    'parameters': [
+        {'name': 'game_id', 'in': 'path', 'required': True, 'schema': {'type': 'integer'}}
+    ],
+    'responses': {
+        200: {
+            'description': 'Game details',
+            'content': {
+                'application/json': {
+                    'examples': {
+                        'example': {
+                            'value': {
+                                'id': 123,
+                                'name': 'Foo',
+                                'description': '<p>HTML description</p>',
+                                'metacritic': 90,
+                                'released': '2020-01-01',
+                                'background_image': '...',
+                                'website': 'https://example.com',
+                                'genres': ['Action'],
+                                'platforms': ['PC']
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        404: {'description': 'Game not found'},
+        500: {'description': 'RAWG API key missing or HTTP error'},
+        503: {'description': 'Failed to fetch from RAWG'}
+    }
+})
 def get_game_details(game_id):
     api_key = current_app.config.get('RAWG_API_KEY')
     if not api_key:

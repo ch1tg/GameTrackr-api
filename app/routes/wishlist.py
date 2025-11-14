@@ -5,11 +5,37 @@ from app.exceptions.exceptions import ValidationException
 from app.schemas.wishlist_schema import wishlist_items_schema, wishlist_item_schema
 from app.services import wishlist_service
 from app.extensions import db
+from flasgger import swag_from
 
 bp = Blueprint('wishlist', __name__, url_prefix='/wishlist')
 
 @bp.route('/', methods=['GET'])
 @jwt_required()
+@swag_from({
+    'tags': ['Wishlist'],
+    'summary': 'Get current user\'s wishlist',
+    'security': [{'bearerAuth': []}],
+    'responses': {
+        200: {
+            'description': 'List of wishlist items',
+            'content': {
+                'application/json': {
+                    'examples': {
+                        'example': {
+                            'summary': 'Success',
+                            'value': [
+                                {"id": 1, "user_id": 7, "rawg_game_id": 12345}
+                            ]
+                        }
+                    }
+                }
+            }
+        },
+        400: {'description': 'Invalid user ID'},
+        409: {'description': 'IntegrityError'},
+        500: {'description': 'Internal Server Error'}
+    }
+})
 def get_wishlist():
     user_id = get_jwt_identity()
     try:
@@ -24,6 +50,54 @@ def get_wishlist():
 
 @bp.route('/', methods=['POST'])
 @jwt_required()
+@swag_from({
+    'tags': ['Wishlist'],
+    'summary': 'Add a game to the current user\'s wishlist',
+    'security': [{'bearerAuth': []}],
+    'parameters': [
+        {
+            'name': 'X-CSRF-TOKEN', 'in': 'header', 'required': True,
+            'schema': {'type': 'string'},
+            'description': 'CSRF token value from csrf_access_token cookie (required when authenticating via cookies)'
+        }
+    ],
+    'requestBody': {
+        'required': True,
+        'content': {
+            'application/json': {
+                'schema': {
+                    'type': 'object',
+                    'properties': {
+                        'rawg_game_id': {'type': 'integer'}
+                    },
+                    'required': ['rawg_game_id']
+                },
+                'examples': {
+                    'example': {
+                        'value': { 'rawg_game_id': 12345 }
+                    }
+                }
+            }
+        }
+    },
+    'responses': {
+        201: {
+            'description': 'Wishlist item created',
+            'content': {
+                'application/json': {
+                    'examples': {
+                        'example': {
+                            'value': {"id": 2, "user_id": 7, "rawg_game_id": 12345}
+                        }
+                    }
+                }
+            }
+        },
+        400: {'description': 'Validation error'},
+        409: {'description': 'IntegrityError'},
+        500: {'description': 'Internal Server Error'}
+    }
+})
 def add_to_wishlist():
     user_id = get_jwt_identity()
     data = request.get_json()
@@ -46,6 +120,28 @@ def add_to_wishlist():
 
 @bp.route('/<int:rawg_game_id>', methods=['DELETE']) # <-- 1. Принимаем ID из URL
 @jwt_required()
+@swag_from({
+    'tags': ['Wishlist'],
+    'summary': 'Remove a game from the current user\'s wishlist',
+    'security': [{'bearerAuth': []}],
+    'parameters': [
+        {
+            'name': 'rawg_game_id', 'in': 'path', 'required': True,
+            'schema': {'type': 'integer'}, 'description': 'RAWG game ID'
+        },
+        {
+            'name': 'X-CSRF-TOKEN', 'in': 'header', 'required': True,
+            'schema': {'type': 'string'},
+            'description': 'CSRF token value from csrf_access_token cookie (required when authenticating via cookies)'
+        }
+    ],
+    'responses': {
+        204: {'description': 'Deleted'},
+        404: {'description': 'Wishlist item not found'},
+        409: {'description': 'IntegrityError'},
+        500: {'description': 'Internal Server Error'}
+    }
+})
 def delete_from_wishlist(rawg_game_id):
     user_id = get_jwt_identity()
     try:
@@ -63,6 +159,24 @@ def delete_from_wishlist(rawg_game_id):
 
 @bp.route('/', methods=['DELETE'])
 @jwt_required()
+@swag_from({
+    'tags': ['Wishlist'],
+    'summary': 'Reset current user\'s wishlist (delete all items)',
+    'security': [{'bearerAuth': []}],
+    'parameters': [
+        {
+            'name': 'X-CSRF-TOKEN', 'in': 'header', 'required': True,
+            'schema': {'type': 'string'},
+            'description': 'CSRF token value from csrf_access_token cookie (required when authenticating via cookies)'
+        }
+    ],
+    'responses': {
+        204: {'description': 'All wishlist items deleted'},
+        400: {'description': 'Invalid user ID'},
+        409: {'description': 'IntegrityError'},
+        500: {'description': 'Internal Server Error'}
+    }
+})
 def reset_wishlist():
     user_id = get_jwt_identity()
     try:

@@ -20,3 +20,27 @@ class Config:
     JWT_COOKIE_SAMESITE = "None"
 
     RAWG_API_KEY = os.environ.get('RAWG_API_KEY')
+    SWAGGER = {
+        'openapi': '3.0.2',
+        'info': {
+            'title': 'GameTrackr API',
+            'version': '1.0.0',
+            'description': 'The official API documentation for the GameTrackr project.'
+        },
+        'uiversion': 3,
+        'securityDefinitions': {
+            # 1. 'bearerAuth' (для JWT)
+            'bearerAuth': {
+                'type': 'apiKey',
+                'name': 'Authorization',
+                'in': 'header',
+                'description': 'JWT Access Token (Format: "Bearer <token>")'
+            },
+            'csrfToken': {
+                'type': 'apiKey',
+                'name': 'X-CSRF-TOKEN',
+                'in': 'header',
+                'description': 'CSRF Token (MUST match \'csrf_access_token\' cookie)'
+            }
+        }
+    }

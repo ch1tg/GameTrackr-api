@@ -1,6 +1,7 @@
 from sqlalchemy import ForeignKey, UniqueConstraint
-
 from app.extensions import db
+from datetime import datetime, timezone
+
 
 class Wishlist(db.Model):
     __tablename__ = 'wishlist'
@@ -9,6 +10,12 @@ class Wishlist(db.Model):
 
     user_id = db.Column(db.Integer, ForeignKey('users.id'), nullable=False)
     rawg_game_id = db.Column(db.Integer, nullable=False)
+    added_on = db.Column(
+        db.DateTime,
+        nullable=False,
+        default=lambda: datetime.now(timezone.utc)
+    )
+
 
     user = db.relationship('User', back_populates='wishlist_items')
 

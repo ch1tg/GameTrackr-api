@@ -47,6 +47,22 @@ def delete_game_from_wishlist(user_id, rawg_game_id):
     return True
 
 
+def get_paginated_wishlist_by_userid(user_id, page=1, per_page=5):
+    try:
+        uid = int(user_id)
+    except (TypeError, ValueError):
+        raise ValidationException("Invalid user ID", status_code=400)
+    pagination = Wishlist.query.filter_by(user_id=uid) \
+        .order_by(Wishlist.added_on.desc()) \
+        .paginate(page=page, per_page=per_page, error_out=False)
+
+    if not pagination.items and page > 1:
+
+        raise ValidationException("Page not found", status_code=404)
+
+    return pagination
+
+
 def reset_wishlist(user_id):
     try:
         uid = int(user_id)
