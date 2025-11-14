@@ -28,19 +28,20 @@ class Config:
             'description': 'The official API documentation for the GameTrackr project.'
         },
         'uiversion': 3,
-        'securityDefinitions': {
-            # 1. 'bearerAuth' (для JWT)
-            'bearerAuth': {
-                'type': 'apiKey',
-                'name': 'Authorization',
-                'in': 'header',
-                'description': 'JWT Access Token (Format: "Bearer <token>")'
-            },
-            'csrfToken': {
-                'type': 'apiKey',
-                'name': 'X-CSRF-TOKEN',
-                'in': 'header',
-                'description': 'CSRF Token (MUST match \'csrf_access_token\' cookie)'
+        'components': {
+            'securitySchemes': {
+                'bearerAuth': {
+                    'type': 'http',
+                    'scheme': 'bearer',
+                    'bearerFormat': 'JWT',
+                    'description': 'JWT Access Token. Format: "Bearer <token>"'
+                },
+                'csrfToken': {
+                    'type': 'apiKey',
+                    'in': 'header',
+                    'name': 'X-CSRF-TOKEN',
+                    'description': 'CSRF Token (from \'csrf_access_token\' cookie)'
+                }
             }
         }
     }

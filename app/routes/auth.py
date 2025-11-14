@@ -126,13 +126,9 @@ def login():
 @swag_from({
     'tags': ['Auth'],
     'summary': 'Logout and clear access cookies',
-    'security': [{'bearerAuth': []}],
-    'parameters': [
-        {
-            'name': 'X-CSRF-TOKEN', 'in': 'header', 'required': True,
-            'schema': {'type': 'string'},
-            'description': 'CSRF token from csrf_access_token cookie (required when authenticating via cookies)'
-        }
+    'security': [
+        {'bearerAuth': []},
+        {'csrfToken': []}
     ],
     'responses': {
         200: {'description': 'Logout successful'}
@@ -148,7 +144,10 @@ def logout():
 @swag_from({
     'tags': ['Auth'],
     'summary': 'Get current user profile',
-    'security': [{'bearerAuth': []}],
+    'security': [
+        {'bearerAuth': []},
+        {'csrfToken': []}
+    ],
     'responses': {
         200: {'description': 'Current user profile'},
         404: {'description': 'User not found'}
@@ -166,13 +165,9 @@ def me():
 @swag_from({
     'tags': ['Auth'],
     'summary': 'Update current user profile',
-    'security': [{'bearerAuth': []}],
-    'parameters': [
-        {
-            'name': 'X-CSRF-TOKEN', 'in': 'header', 'required': True,
-            'schema': {'type': 'string'},
-            'description': 'CSRF token from csrf_access_token cookie (required when authenticating via cookies)'
-        }
+    'security': [
+        {'bearerAuth': []},
+        {'csrfToken': []}
     ],
     'requestBody': {
         'required': True,
@@ -221,13 +216,9 @@ def me_patch():
 @swag_from({
     'tags': ['Auth'],
     'summary': 'Change current user password',
-    'security': [{'bearerAuth': []}],
-    'parameters': [
-        {
-            'name': 'X-CSRF-TOKEN', 'in': 'header', 'required': True,
-            'schema': {'type': 'string'},
-            'description': 'CSRF token from csrf_access_token cookie (required when authenticating via cookies)'
-        }
+    'security': [
+        {'bearerAuth': []},
+        {'csrfToken': []}
     ],
     'requestBody': {
         'required': True,
@@ -277,13 +268,9 @@ def me_password():
 @swag_from({
     'tags': ['Auth'],
     'summary': 'Delete current user account',
-    'security': [{'bearerAuth': []}],
-    'parameters': [
-        {
-            'name': 'X-CSRF-TOKEN', 'in': 'header', 'required': True,
-            'schema': {'type': 'string'},
-            'description': 'CSRF token from csrf_access_token cookie (required when authenticating via cookies)'
-        }
+    'security': [
+        {'bearerAuth': []},
+        {'csrfToken': []}
     ],
     'requestBody': {
         'required': True,

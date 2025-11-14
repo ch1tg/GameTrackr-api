@@ -14,7 +14,10 @@ bp = Blueprint('wishlist', __name__, url_prefix='/wishlist')
 @swag_from({
     'tags': ['Wishlist'],
     'summary': 'Get current user\'s wishlist',
-    'security': [{'bearerAuth': []}],
+    'security': [
+        {'bearerAuth': []},
+        {'csrfToken': []}
+    ],
     'responses': {
         200: {
             'description': 'List of wishlist items',
@@ -53,13 +56,9 @@ def get_wishlist():
 @swag_from({
     'tags': ['Wishlist'],
     'summary': 'Add a game to the current user\'s wishlist',
-    'security': [{'bearerAuth': []}],
-    'parameters': [
-        {
-            'name': 'X-CSRF-TOKEN', 'in': 'header', 'required': True,
-            'schema': {'type': 'string'},
-            'description': 'CSRF token value from csrf_access_token cookie (required when authenticating via cookies)'
-        }
+    'security': [
+        {'bearerAuth': []},
+        {'csrfToken': []}
     ],
     'requestBody': {
         'required': True,
@@ -123,17 +122,15 @@ def add_to_wishlist():
 @swag_from({
     'tags': ['Wishlist'],
     'summary': 'Remove a game from the current user\'s wishlist',
-    'security': [{'bearerAuth': []}],
+    'security': [
+        {'bearerAuth': []},
+        {'csrfToken': []}
+    ],
     'parameters': [
         {
             'name': 'rawg_game_id', 'in': 'path', 'required': True,
             'schema': {'type': 'integer'}, 'description': 'RAWG game ID'
         },
-        {
-            'name': 'X-CSRF-TOKEN', 'in': 'header', 'required': True,
-            'schema': {'type': 'string'},
-            'description': 'CSRF token value from csrf_access_token cookie (required when authenticating via cookies)'
-        }
     ],
     'responses': {
         204: {'description': 'Deleted'},
@@ -162,13 +159,9 @@ def delete_from_wishlist(rawg_game_id):
 @swag_from({
     'tags': ['Wishlist'],
     'summary': 'Reset current user\'s wishlist (delete all items)',
-    'security': [{'bearerAuth': []}],
-    'parameters': [
-        {
-            'name': 'X-CSRF-TOKEN', 'in': 'header', 'required': True,
-            'schema': {'type': 'string'},
-            'description': 'CSRF token value from csrf_access_token cookie (required when authenticating via cookies)'
-        }
+    'security': [
+        {'bearerAuth': []},
+        {'csrfToken': []}
     ],
     'responses': {
         204: {'description': 'All wishlist items deleted'},
