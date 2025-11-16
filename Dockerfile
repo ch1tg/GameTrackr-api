@@ -10,4 +10,4 @@ RUN addgroup --system appgroup && adduser --system --no-create-home --ingroup ap
 
 USER appuser
 
-CMD ["uvicorn", "--host", "0.0.0.0", "--port", "5000", "--workers", "4", "run:app"]
+CMD ["gunicorn", "--workers", "4", "--bind", "0.0.0.0:5000", "run:app"]
