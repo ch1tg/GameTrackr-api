@@ -38,7 +38,7 @@ def _transform_rawg_game_details(game):
         'platforms': platforms,
     }
 
-@cache.memoize(timeout=1200, key_prefix="rawg_game")
+@cache.memoize(timeout=1200)
 def get_trending_games(page=1, ordering='-relevance', platform_id=None):
 
     api_key = current_app.config.get('RAWG_API_KEY')
@@ -70,12 +70,8 @@ def get_trending_games(page=1, ordering='-relevance', platform_id=None):
         'nextPage': page + 1 if has_next_page else None
     }
 
-@cache.memoize(timeout=86400, key_prefix="rawg_game_details") # <-- Можете оставить свой префикс
+@cache.memoize(timeout=86400)
 def _fetch_rawg_details_sync(game_id):
-    """
-    (Приватная) Кэшируемая 'базовая' функция.
-    Получает "сырой" JSON из RAWG.
-    """
     api_key = current_app.config.get('RAWG_API_KEY')
     if not api_key:
         raise ValueError("RAWG API key is not configured")
