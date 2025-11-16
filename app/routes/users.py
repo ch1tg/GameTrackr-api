@@ -1,11 +1,11 @@
 from flask import request, jsonify, Blueprint, current_app
 from app.services import user_service
+from app.services import game_service
 from app.services import wishlist_service
 from app.exceptions.exceptions import ValidationException
-from app.schemas.user_schema import user_default_schema, user_public_schema
+from app.schemas.user_schema import user_public_schema
 
 import requests
-from app.routes.games import transform_rawg_game_preview
 from flasgger import swag_from
 
 bp = Blueprint('users', __name__, url_prefix='/users')
@@ -77,7 +77,6 @@ def get_user(username):
     }
 })
 def get_user_wishlist(username):
-
     try:
         page = request.args.get('page', 1, type=int)
         limit = request.args.get('limit', 5, type=int)
@@ -101,23 +100,24 @@ def get_user_wishlist(username):
         rawg_ids = [item.rawg_game_id for item in pagination.items]
         has_next_page = pagination.has_next
 
-        api_key = current_app.config.get('RAWG_API_KEY')
-        if not api_key:
-            return jsonify({"error": "RAWG API key not configured"}), 500
-
         games_preview_list = []
         for game_id in rawg_ids:
             try:
-                url = f'https://api.rawg.io/api/games/{game_id}'
-                params = {'key': api_key}
-                response = requests.get(url, params=params, timeout=5)
-                response.raise_for_status()
-                raw_data = response.json()
-
-                game_preview = transform_rawg_game_preview(raw_data)
+                game_preview = game_service.get_game_preview(game_id)
                 games_preview_list.append(game_preview)
+
+
+            except requests.exceptions.HTTPError as e:
+                if e.response.status_code == 404:
+                    current_app.logger.warning(f"GameID {game_id} (from wishlist) not found in RAWG")
+                else:
+                    current_app.logger.error(f"Failed to fetch game_id {game_id} (HTTPError): {e}")
+                pass
             except requests.exceptions.RequestException as e:
-                current_app.logger.error(f"Failed to fetch game_id {game_id} from RAWG: {e}")
+                current_app.logger.error(f"Failed to fetch game_id {game_id} (ConnectionError): {e}")
+                pass
+            except Exception as e:
+                current_app.logger.error(f"Failed to process game_id {game_id}: {e}")
                 pass
 
         return jsonify({
@@ -128,5 +128,4 @@ def get_user_wishlist(username):
     except ValidationException as e:
         return jsonify({"error": e.message}), e.status_code
     except Exception as e:
-        # Общий "отлов"
         return jsonify({"error": f"Internal Server Error: {str(e)}"}), 500
