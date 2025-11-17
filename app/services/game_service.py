@@ -1,42 +1,7 @@
 import requests
 from flask import current_app
 from app.extensions import cache
-
-def _transform_rawg_game_preview(game):
-    platforms = []
-    if game.get('parent_platforms'):
-        platforms = [
-            p.get('platform', {}).get('slug')
-            for p in game.get('parent_platforms', [])
-            if p.get('platform')
-        ]
-
-    return {
-        'id': game.get('id'),
-        'name': game.get('name'),
-        'background_image': game.get('background_image'),
-        'metacritic': game.get('metacritic'),
-        'parent_platforms': platforms
-    }
-
-
-def _transform_rawg_game_details(game):
-    genres = [g.get('name') for g in game.get('genres', []) if g.get('name')]
-    platforms = []
-    if game.get('platforms'):
-        platforms = [p.get('platform', {}).get('name') for p in game.get('platforms', []) if p.get('platform')]
-
-    return {
-        'id': game.get('id'),
-        'name': game.get('name'),
-        'description': game.get('description'),
-        'metacritic': game.get('metacritic'),
-        'released': game.get('released'),
-        'background_image': game.get('background_image'),
-        'website': game.get('website'),
-        'genres': genres,
-        'platforms': platforms,
-    }
+from app.utils.transformers import transform_rawg_game_preview, transform_rawg_game_details
 
 @cache.memoize(timeout=1200)
 def get_trending_games(page=1, ordering='-relevance', platform_id=None):
@@ -62,7 +27,7 @@ def get_trending_games(page=1, ordering='-relevance', platform_id=None):
     response.raise_for_status()
 
     raw_data = response.json()
-    games = [_transform_rawg_game_preview(game) for game in raw_data.get('results', [])]
+    games = [transform_rawg_game_preview(game) for game in raw_data.get('results', [])]
     has_next_page = raw_data.get('next') is not None
 
     return {
@@ -86,10 +51,10 @@ def _fetch_rawg_details_sync(game_id):
 
 def get_game_details(game_id):
     raw_data = _fetch_rawg_details_sync(game_id)
-    return _transform_rawg_game_details(raw_data)
+    return transform_rawg_game_details(raw_data)
 
 
 
 def get_game_preview(game_id):
     raw_data = _fetch_rawg_details_sync(game_id)
-    return _transform_rawg_game_preview(raw_data)
+    return transform_rawg_game_preview(raw_data)

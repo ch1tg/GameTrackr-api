@@ -30,5 +30,7 @@ def create_app(config_class=Config):
     app.register_blueprint(games.bp)
     from .routes import wishlist
     app.register_blueprint(wishlist.bp)
+    from .routes import search
+    app.register_blueprint(search.bp)
 
     return app
