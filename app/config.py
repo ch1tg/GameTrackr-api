@@ -19,6 +19,12 @@ class Config:
     JWT_COOKIE_SECURE = False
     JWT_COOKIE_SAMESITE = "None"
 
+    _REDIS_HOST = os.environ.get("REDIS_HOST", "redis")
+    _REDIS_PORT = os.environ.get("REDIS_PORT", 6379)
+    CACHE_TYPE = "redis"
+    CACHE_REDIS_URL = f"redis://{_REDIS_HOST}:{_REDIS_PORT}/0"
+    CACHE_DEFAULT_TIMEOUT = int(os.environ.get("CACHE_DEFAULT_TIMEOUT", 3600))
+
     RAWG_API_KEY = os.environ.get('RAWG_API_KEY')
     SWAGGER = {
         'openapi': '3.0.2',

@@ -16,6 +16,7 @@ services:
       - .:/app
     depends_on:
       - db
+      - redis
 
   db:
     container_name: gametrackr-db
@@ -33,3 +34,9 @@ services:
       MYSQL_DATABASE: ${DB_NAME}
       MYSQL_USER: ${DB_USER}
       MYSQL_PASSWORD: ${DB_PASSWORD}
+
+  redis:
+    container_name: gametrackr-redis
+    image: redis:alpine
+    volumes:
+      - ./redis-data:/data
